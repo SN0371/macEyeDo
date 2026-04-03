@@ -92,23 +92,49 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // Poisson process: average one blink every 10s → per-frame probability
     let blinkProbPerFrame: Double = 1.0 - exp(-1.0 / (10.0 * 30.0))
 
+    private lazy var calendarVC: CalendarViewController = CalendarViewController()
+
+    private lazy var popover: NSPopover = {
+        let p = NSPopover()
+        p.contentViewController = calendarVC
+        p.behavior = .transient
+        p.animates = true
+        return p
+    }()
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
         guard let button = statusItem.button else { return }
         button.imageScaling = .scaleProportionallyDown
-
-        let menu = NSMenu()
-        menu.addItem(NSMenuItem(title: "macEyes", action: nil, keyEquivalent: ""))
-        menu.addItem(.separator())
-        menu.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
-        statusItem.menu = menu
+        button.action = #selector(handleClick(_:))
+        button.target = self
+        button.sendAction(on: [.leftMouseUp, .rightMouseUp])
 
         updateEyes()
 
         // Refresh at ~30 fps
         timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 30.0, repeats: true) { [weak self] _ in
             self?.tick()
+        }
+    }
+
+    @objc func handleClick(_ sender: NSStatusBarButton) {
+        guard let event = NSApp.currentEvent else { return }
+        if event.type == .rightMouseUp {
+            // Right-click: minimal context menu with quit
+            let menu = NSMenu()
+            menu.addItem(NSMenuItem(title: "Quit macEyes",
+                                    action: #selector(NSApplication.terminate(_:)),
+                                    keyEquivalent: "q"))
+            NSMenu.popUpContextMenu(menu, with: event, for: sender)
+        } else {
+            // Left-click: toggle calendar popover
+            if popover.isShown {
+                popover.performClose(sender)
+            } else {
+                popover.show(relativeTo: sender.bounds, of: sender, preferredEdge: .minY)
+            }
         }
     }
 
