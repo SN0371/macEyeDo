@@ -2,7 +2,7 @@ import AppKit
 
 // --- Eye drawing ---
 
-func drawEyes(size: NSSize, mouseScreen: NSPoint, buttonScreenFrame: NSRect, blinkProgress: CGFloat) -> NSImage {
+func drawEyes(size: NSSize, mouseScreen: NSPoint, buttonScreenFrame: NSRect, blinkProgress: CGFloat, scleraRedness: CGFloat) -> NSImage {
     let image = NSImage(size: size)
     image.lockFocus()
 
@@ -46,7 +46,13 @@ func drawEyes(size: NSSize, mouseScreen: NSPoint, buttonScreenFrame: NSRect, bli
             height: visibleEyeH
         )
         let eyePath = NSBezierPath(ovalIn: eyeRect)
-        NSColor.white.setFill()
+        let scleraColor = scleraRedness > 0
+            ? NSColor(red: 1.0,
+                      green: 1.0 - scleraRedness * 0.55,
+                      blue:  1.0 - scleraRedness * 0.55,
+                      alpha: 1.0)
+            : NSColor.white
+        scleraColor.setFill()
         eyePath.fill()
         NSColor.black.withAlphaComponent(0.7).setStroke()
         eyePath.lineWidth = 1
@@ -124,7 +130,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if event.type == .rightMouseUp {
             // Right-click: minimal context menu with quit
             let menu = NSMenu()
-            menu.addItem(NSMenuItem(title: "Quit macEyes",
+            menu.addItem(NSMenuItem(title: "Quit macEyeDo",
                                     action: #selector(NSApplication.terminate(_:)),
                                     keyEquivalent: "q"))
             NSMenu.popUpContextMenu(menu, with: event, for: sender)
@@ -182,7 +188,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             size: iconSize,
             mouseScreen: mouse,
             buttonScreenFrame: imageScreenFrame,
-            blinkProgress: blinkProgress
+            blinkProgress: blinkProgress,
+            scleraRedness: TodoStore.shared.urgencyLevel()
         )
         button.image = image
     }

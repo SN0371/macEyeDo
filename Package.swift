@@ -2,12 +2,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "maceyes",
+    name: "maceyedo",
     platforms: [.macOS(.v13)],
     targets: [
         .executableTarget(
-            name: "maceyes",
-            path: "Sources/maceyes"
+            name: "maceyedo",
+            path: "Sources/maceyedo"
         )
     ]
 )
