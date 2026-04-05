@@ -14,7 +14,7 @@ struct TodoItem: Codable {
 
 final class TodoStore {
     static let shared = TodoStore()
-    private let key = "maceyes.todos.v1"
+    private let key = "maceyedo.todos.v1"
     private var data: [String: [TodoItem]] = [:]
 
     private init() { load() }
@@ -70,7 +70,8 @@ final class TodoStore {
     }
 
     private func load() {
-        guard let saved = UserDefaults.standard.data(forKey: key),
+        let ud = UserDefaults.standard
+        guard let saved = ud.data(forKey: key),
               let decoded = try? JSONDecoder().decode([String: [TodoItem]].self, from: saved)
         else { return }
         data = decoded
