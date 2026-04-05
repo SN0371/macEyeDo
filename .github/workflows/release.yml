@@ -22,12 +22,11 @@ jobs:
 
       - name: Create .app bundle
         run: |
-          APP=macEyes.app
+          APP=macEyeDo.app
           mkdir -p "$APP/Contents/MacOS"
           mkdir -p "$APP/Contents/Resources"
 
-          # SPM writes the universal binary here when both archs are specified
-          cp .build/apple/Products/Release/maceyes "$APP/Contents/MacOS/macEyes"
+          cp .build/apple/Products/Release/maceyedo "$APP/Contents/MacOS/macEyeDo"
 
           cat > "$APP/Contents/Info.plist" <<'PLIST'
           <?xml version="1.0" encoding="UTF-8"?>
@@ -35,10 +34,10 @@ jobs:
             "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
           <dict>
-            <key>CFBundleExecutable</key>      <string>macEyes</string>
-            <key>CFBundleIdentifier</key>      <string>com.sn0371.maceyes</string>
-            <key>CFBundleName</key>            <string>macEyes</string>
-            <key>CFBundleDisplayName</key>     <string>macEyes</string>
+            <key>CFBundleExecutable</key>      <string>macEyeDo</string>
+            <key>CFBundleIdentifier</key>      <string>com.sn0371.maceyedo</string>
+            <key>CFBundleName</key>            <string>macEyeDo</string>
+            <key>CFBundleDisplayName</key>     <string>macEyeDo</string>
             <key>CFBundleVersion</key>         <string>${{ github.ref_name }}</string>
             <key>CFBundleShortVersionString</key> <string>${{ github.ref_name }}</string>
             <key>CFBundlePackageType</key>     <string>APPL</string>
@@ -50,10 +49,10 @@ jobs:
           PLIST
 
       - name: Zip .app
-        run: zip -r macEyes-${{ github.ref_name }}.zip macEyes.app
+        run: zip -r macEyeDo-${{ github.ref_name }}.zip macEyeDo.app
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: macEyes-${{ github.ref_name }}.zip
+          files: macEyeDo-${{ github.ref_name }}.zip
           generate_release_notes: true
